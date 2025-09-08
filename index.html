@@ -138,31 +138,6 @@
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
         }
 
-        button {
-            padding: 14px 24px;
-            background: linear-gradient(120deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
         .calendar-container {
             padding: 20px;
             overflow-x: auto;
@@ -313,11 +288,6 @@
                 width: 100%;
             }
             
-            button {
-                width: 100%;
-                justify-content: center;
-            }
-            
             .calendar {
                 gap: 5px;
             }
@@ -412,11 +382,6 @@
                         <!-- Os anos serão preenchidos via JavaScript -->
                     </select>
                 </div>
-                
-                <button id="generate">
-                    <i class="fas fa-sync-alt"></i>
-                    Gerar Calendário
-                </button>
             </div>
         </div>
         
@@ -487,9 +452,6 @@
             
             // Gerar calendário ao carregar a página
             generateCalendar();
-            
-            // Gerar calendário ao clicar no botão
-            document.getElementById('generate').addEventListener('click', generateCalendar);
             
             // Atualizar calendário ao mudar mês ou ano
             document.getElementById('month').addEventListener('change', function() {
@@ -614,5 +576,3 @@
     </script>
 </body>
 </html>
-
-
