@@ -6,214 +6,421 @@
     <title>Controle de Folgas por Turno</title>
     <!-- Meta tags para comportamento de app no iPhone -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Folgas">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #fca311;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
         * {
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background-color: #f5f7f9;
             margin: 0;
-            padding: 10px; /* Reduzido para mobile */
+            padding: 0;
         }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            padding: 16px;
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .container {
+            width: 100%;
             max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 15px; /* Reduzido para mobile */
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            overflow-x: auto; /* Permite rolagem horizontal se necessário */
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-top: 20px;
         }
-        h1 {
+
+        .header {
+            background: linear-gradient(120deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 20px; /* Reduzido para mobile */
-            font-size: 1.5rem; /* Tamanho menor para mobile */
+            position: relative;
+            overflow: hidden;
         }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+            transform: rotate(30deg);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+            position: relative;
+        }
+
+        .controls-container {
+            padding: 20px;
+            background-color: var(--light);
+            border-bottom: 1px solid var(--light-gray);
+        }
+
         .controls {
             display: flex;
-            justify-content: center;
-            gap: 10px; /* Reduzido para mobile */
-            margin-bottom: 20px; /* Reduzido para mobile */
             flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
         }
-        select, button {
-            padding: 12px 10px; /* Aumentado para melhor toque em mobile */
-            border: 1px solid #ddd;
-            border-radius: 5px;
+
+        .select-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .select-wrapper::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--gray);
+        }
+
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            background-color: white;
             font-size: 16px;
-            min-height: 44px; /* Tamanho mínimo para toque em mobile */
+            appearance: none;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+
         button {
-            background-color: #3498db;
+            padding: 14px 24px;
+            background: linear-gradient(120deg, var(--primary), var(--secondary));
             color: white;
             border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
         }
+
         button:hover {
-            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
         }
+
+        button:active {
+            transform: translateY(0);
+        }
+
         .calendar-container {
-            width: 100%;
-            overflow-x: auto; /* Permite rolar horizontalmente se necessário */
-            margin-bottom: 20px;
+            padding: 20px;
+            overflow-x: auto;
         }
+
         .calendar {
             display: grid;
-            grid-template-columns: repeat(7, minmax(40px, 1fr)); /* Tamanho mínimo para células */
-            gap: 5px; /* Reduzido para mobile */
-            margin-bottom: 20px; /* Reduzido para mobile */
-            min-width: 0; /* Permite que o grid se ajuste ao container */
+            grid-template-columns: repeat(7, minmax(50px, 1fr));
+            gap: 8px;
+            min-width: 0;
         }
+
         .calendar-header {
             grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: repeat(7, minmax(40px, 1fr));
+            grid-template-columns: repeat(7, 1fr);
             text-align: center;
-            font-weight: bold;
-            color: #2c3e50;
-            padding: 8px 0; /* Reduzido para mobile */
-            border-bottom: 2px solid #eee;
+            font-weight: 600;
+            color: var(--gray);
+            padding: 15px 0;
+            border-bottom: 2px solid var(--light-gray);
         }
+
         .day-header {
-            padding: 8px 2px; /* Reduzido para mobile */
+            padding: 10px;
             text-align: center;
-            font-size: 0.85rem; /* Reduzido para mobile */
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray);
         }
+
         .day {
-            min-height: 70px; /* Altura mínima em vez de fixa */
-            padding: 5px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            background-color: #fff;
+            min-height: 80px;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            background-color: white;
             position: relative;
             display: flex;
             flex-direction: column;
+            transition: var(--transition);
+            border: 1px solid var(--light-gray);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
+
+        .day:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
         .day-number {
             align-self: flex-end;
-            font-weight: bold;
-            color: #2c3e50;
+            font-weight: 600;
+            color: var(--dark);
             font-size: 0.9rem;
             margin-bottom: 5px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .day-content {
             text-align: center;
-            font-size: 0.75rem; /* Reduzido para mobile */
-            padding: 3px;
-            border-radius: 3px;
+            font-size: 0.75rem;
+            padding: 5px;
+            border-radius: 6px;
             color: white;
             font-weight: bold;
             margin-top: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         .holiday {
             background-color: #ff7675;
         }
+
         .legend {
             display: flex;
             justify-content: center;
-            gap: 10px; /* Reduzido para mobile */
+            gap: 20px;
             flex-wrap: wrap;
-            margin-top: 20px;
+            padding: 20px;
+            background-color: var(--light);
+            border-top: 1px solid var(--light-gray);
         }
+
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             font-size: 0.9rem;
-        }
-        .legend-color {
-            width: 18px; /* Reduzido para mobile */
-            height: 18px; /* Reduzido para mobile */
-            border-radius: 3px;
-        }
-        .turno1 { background-color: #3498db; }
-        .turno2 { background-color: #2ecc71; }
-        .turno3 { background-color: #e74c3c; }
-        .folguista { background-color: #f39c12; }
-        .sunday {
-            background-color: #ffeaea;
-        }
-        .saturday {
-            background-color: #f9f9f9;
-        }
-        .current-day {
-            border: 2px solid #3498db;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        /* Media queries para telas maiores */
-        @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 2rem;
-                margin-bottom: 30px;
-            }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .turno1 { 
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+        .turno2 { 
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+        .turno3 { 
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+        .folguista { 
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+        }
+
+        .sunday {
+            background-color: #fff5f5;
+        }
+
+        .saturday {
+            background-color: #f8f9fa;
+        }
+
+        .current-day .day-number {
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+        }
+
+        .month-year-display {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Media queries para responsividade */
+        @media (max-width: 768px) {
             .controls {
-                gap: 15px;
-                margin-bottom: 30px;
+                flex-direction: column;
             }
+            
+            .select-wrapper {
+                width: 100%;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            
             .calendar {
-                gap: 8px;
+                gap: 5px;
             }
-            .calendar-header {
-                padding: 10px 0;
-            }
-            .day-header {
-                padding: 10px;
-                font-size: 1rem;
-            }
+            
             .day {
-                height: 80px;
+                min-height: 70px;
+                padding: 8px 5px;
             }
-            .day-content {
-                font-size: 0.85rem;
+            
+            .day-header {
+                padding: 8px 2px;
+                font-size: 0.8rem;
             }
+            
             .legend {
-                gap: 15px;
+                gap: 10px;
             }
-            .legend-color {
+            
+            .legend-item {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .day {
+                min-height: 60px;
+            }
+            
+            .day-number {
+                font-size: 0.8rem;
                 width: 20px;
                 height: 20px;
             }
+            
+            .day-content {
+                font-size: 0.7rem;
+                padding: 3px;
+            }
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .calendar {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .day {
+            animation: fadeIn 0.3s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Controle de Folgas por Turno</h1>
-        
-        <div class="controls">
-            <select id="month">
-                <option value="0">Janeiro</option>
-                <option value="1">Fevereiro</option>
-                <option value="2">Março</option>
-                <option value="3">Abril</option>
-                <option value="4">Maio</option>
-                <option value="5">Junho</option>
-                <option value="6">Julho</option>
-                <option value="7">Agosto</option>
-                <option value="8">Setembro</option>
-                <option value="9">Outubro</option>
-                <option value="10">Novembro</option>
-                <option value="11">Dezembro</option>
-            </select>
-            
-            <select id="year">
-                <!-- Os anos serão preenchidos via JavaScript -->
-            </select>
-            
-            <button id="generate">Gerar Calendário</button>
+        <div class="header">
+            <h1>Controle de Folgas por Turno</h1>
+            <div class="subtitle">Visualize as folgas de forma prática e organizada</div>
         </div>
+        
+        <div class="controls-container">
+            <div class="controls">
+                <div class="select-wrapper">
+                    <select id="month">
+                        <option value="0">Janeiro</option>
+                        <option value="1">Fevereiro</option>
+                        <option value="2">Março</option>
+                        <option value="3">Abril</option>
+                        <option value="4">Maio</option>
+                        <option value="5">Junho</option>
+                        <option value="6">Julho</option>
+                        <option value="7">Agosto</option>
+                        <option value="8">Setembro</option>
+                        <option value="9">Outubro</option>
+                        <option value="10">Novembro</option>
+                        <option value="11">Dezembro</option>
+                    </select>
+                </div>
+                
+                <div class="select-wrapper">
+                    <select id="year">
+                        <!-- Os anos serão preenchidos via JavaScript -->
+                    </select>
+                </div>
+                
+                <button id="generate">
+                    <i class="fas fa-sync-alt"></i>
+                    Gerar Calendário
+                </button>
+            </div>
+        </div>
+        
+        <div class="month-year-display" id="month-year"></div>
         
         <div class="calendar-container">
             <div class="calendar">
@@ -245,7 +452,7 @@
             </div>
             <div class="legend-item">
                 <div class="legend-color folguista"></div>
-                <span>Folga Turno Folguista</span>
+                <span>Folguista</span>
             </div>
         </div>
     </div>
@@ -275,11 +482,36 @@
             const currentMonth = new Date().getMonth();
             document.getElementById('month').value = currentMonth;
             
+            // Atualizar display do mês/ano
+            updateMonthYearDisplay();
+            
             // Gerar calendário ao carregar a página
             generateCalendar();
             
             // Gerar calendário ao clicar no botão
             document.getElementById('generate').addEventListener('click', generateCalendar);
+            
+            // Atualizar calendário ao mudar mês ou ano
+            document.getElementById('month').addEventListener('change', function() {
+                updateMonthYearDisplay();
+                generateCalendar();
+            });
+            
+            document.getElementById('year').addEventListener('change', function() {
+                updateMonthYearDisplay();
+                generateCalendar();
+            });
+            
+            function updateMonthYearDisplay() {
+                const month = parseInt(document.getElementById('month').value);
+                const year = parseInt(document.getElementById('year').value);
+                const monthNames = [
+                    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                ];
+                
+                document.getElementById('month-year').textContent = `${monthNames[month]} de ${year}`;
+            }
             
             function generateCalendar() {
                 const month = parseInt(document.getElementById('month').value);
@@ -303,6 +535,7 @@
                 for (let i = 0; i < startingDay; i++) {
                     const emptyDay = document.createElement('div');
                     emptyDay.classList.add('day');
+                    emptyDay.style.visibility = 'hidden';
                     calendar.appendChild(emptyDay);
                 }
                 
@@ -380,6 +613,6 @@
         });
     </script>
 </body>
-
 </html>
+
 
