@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Folgas por Turno</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f7f9;
+            margin: 0;
+            padding: 10px; /* Reduzido para mobile */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 15px; /* Reduzido para mobile */
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* Permite rolagem horizontal se necessário */
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px; /* Reduzido para mobile */
+            font-size: 1.5rem; /* Tamanho menor para mobile */
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Reduzido para mobile */
+            margin-bottom: 20px; /* Reduzido para mobile */
+            flex-wrap: wrap;
+        }
+        select, button {
+            padding: 12px 10px; /* Aumentado para melhor toque em mobile */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            min-height: 44px; /* Tamanho mínimo para toque em mobile */
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .calendar-container {
+            width: 100%;
+            overflow-x: auto; /* Permite rolar horizontalmente se necessário */
+            margin-bottom: 20px;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(40px, 1fr)); /* Tamanho mínimo para células */
+            gap: 5px; /* Reduzido para mobile */
+            margin-bottom: 20px; /* Reduzido para mobile */
+            min-width: 0; /* Permite que o grid se ajuste ao container */
+        }
+        .calendar-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(7, minmax(40px, 1fr));
+            text-align: center;
+            font-weight: bold;
+            color: #2c3e50;
+            padding: 8px 0; /* Reduzido para mobile */
+            border-bottom: 2px solid #eee;
+        }
+        .day-header {
+            padding: 8px 2px; /* Reduzido para mobile */
+            text-align: center;
+            font-size: 0.85rem; /* Reduzido para mobile */
+        }
+        .day {
+            min-height: 70px; /* Altura mínima em vez de fixa */
+            padding: 5px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #fff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .day-number {
+            align-self: flex-end;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        .day-content {
+            text-align: center;
+            font-size: 0.75rem; /* Reduzido para mobile */
+            padding: 3px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+            margin-top: auto;
+        }
+        .holiday {
+            background-color: #ff7675;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Reduzido para mobile */
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        .legend-color {
+            width: 18px; /* Reduzido para mobile */
+            height: 18px; /* Reduzido para mobile */
+            border-radius: 3px;
+        }
+        .turno1 { background-color: #3498db; }
+        .turno2 { background-color: #2ecc71; }
+        .turno3 { background-color: #e74c3c; }
+        .folguista { background-color: #f39c12; }
+        .sunday {
+            background-color: #ffeaea;
+        }
+        .saturday {
+            background-color: #f9f9f9;
+        }
+        .current-day {
+            border: 2px solid #3498db;
+        }
+
+        /* Media queries para telas maiores */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+            .controls {
+                gap: 15px;
+                margin-bottom: 30px;
+            }
+            .calendar {
+                gap: 8px;
+            }
+            .calendar-header {
+                padding: 10px 0;
+            }
+            .day-header {
+                padding: 10px;
+                font-size: 1rem;
+            }
+            .day {
+                height: 80px;
+            }
+            .day-content {
+                font-size: 0.85rem;
+            }
+            .legend {
+                gap: 15px;
+            }
+            .legend-color {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Folgas por Turno</h1>
+        
+        <div class="controls">
+            <select id="month">
+                <option value="0">Janeiro</option>
+                <option value="1">Fevereiro</option>
+                <option value="2">Março</option>
+                <option value="3">Abril</option>
+                <option value="4">Maio</option>
+                <option value="5">Junho</option>
+                <option value="6">Julho</option>
+                <option value="7">Agosto</option>
+                <option value="8">Setembro</option>
+                <option value="9">Outubro</option>
+                <option value="10">Novembro</option>
+                <option value="11">Dezembro</option>
+            </select>
+            
+            <select id="year">
+                <!-- Os anos serão preenchidos via JavaScript -->
+            </select>
+            
+            <button id="generate">Gerar Calendário</button>
+        </div>
+        
+        <div class="calendar-container">
+            <div class="calendar">
+                <div class="calendar-header">
+                    <div class="day-header">Dom</div>
+                    <div class="day-header">Seg</div>
+                    <div class="day-header">Ter</div>
+                    <div class="day-header">Qua</div>
+                    <div class="day-header">Qui</div>
+                    <div class="day-header">Sex</div>
+                    <div class="day-header">Sáb</div>
+                </div>
+                <!-- Os dias do calendário serão preenchidos via JavaScript -->
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color turno1"></div>
+                <span>Folga Turno 1</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color turno2"></div>
+                <span>Folga Turno 2</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color turno3"></div>
+                <span>Folga Turno 3</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color folguista"></div>
+                <span>Folga Turno Folguista</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preencher anos no seletor (de 2020 a 2040)
+            const yearSelect = document.getElementById('year');
+            const currentYear = new Date().getFullYear();
+            
+            // Limpar seleção atual
+            yearSelect.innerHTML = '';
+            
+            for (let year = 2020; year <= 2040; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+                
+                // Selecionar o ano atual por padrão
+                if (year === currentYear) {
+                    option.selected = true;
+                }
+            }
+            
+            // Selecionar o mês atual por padrão
+            const currentMonth = new Date().getMonth();
+            document.getElementById('month').value = currentMonth;
+            
+            // Gerar calendário ao carregar a página
+            generateCalendar();
+            
+            // Gerar calendário ao clicar no botão
+            document.getElementById('generate').addEventListener('click', generateCalendar);
+            
+            function generateCalendar() {
+                const month = parseInt(document.getElementById('month').value);
+                const year = parseInt(document.getElementById('year').value);
+                
+                // Limpar calendário anterior (exceto o cabeçalho)
+                const calendar = document.querySelector('.calendar');
+                while (calendar.children.length > 1) {
+                    calendar.removeChild(calendar.lastChild);
+                }
+                
+                // Obter o primeiro dia do mês e o número de dias
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                
+                // Determinar em qual dia da semana começa o mês (0 = Domingo, 1 = Segunda, etc.)
+                let startingDay = firstDay.getDay();
+                
+                // Criar células vazias para os dias antes do início do mês
+                for (let i = 0; i < startingDay; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.classList.add('day');
+                    calendar.appendChild(emptyDay);
+                }
+                
+                // Data de referência para cálculo das folgas (4 e 5 de maio de 2023 - folga turno 1)
+                const referenceDate = new Date(2023, 4, 4); // 4 de maio de 2023 (mês 4 = maio)
+                
+                // Criar células para cada dia do mês
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.classList.add('day');
+                    
+                    // Destacar o dia atual
+                    const today = new Date();
+                    if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                        dayElement.classList.add('current-day');
+                    }
+                    
+                    // Adicionar classe para domingos e sábados
+                    const currentDate = new Date(year, month, day);
+                    if (currentDate.getDay() === 0) {
+                        dayElement.classList.add('sunday');
+                    } else if (currentDate.getDay() === 6) {
+                        dayElement.classList.add('saturday');
+                    }
+                    
+                    // Número do dia
+                    const dayNumber = document.createElement('div');
+                    dayNumber.classList.add('day-number');
+                    dayNumber.textContent = day;
+                    dayElement.appendChild(dayNumber);
+                    
+                    // Calcular a diferença em dias a partir da data de referência
+                    const diffTime = currentDate - referenceDate;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    // Calcular o ciclo de folgas (ciclo de 8 dias: 6 trabalhos + 2 folgas)
+                    const cycleDay = (diffDays % 8 + 8) % 8; // Garantir valor positivo
+                    
+                    // Determinar qual turno está de folga - CORRIGIDO
+                    let turnoFolga = '';
+                    let turnoText = '';
+                    
+                    // Dias 0 e 1 do ciclo são folga do turno 1 (referência: 4 e 5 de maio)
+                    if (cycleDay === 0 || cycleDay === 1) {
+                        turnoFolga = 'turno2';
+                        turnoText = 'T2';
+                    } 
+                    // Dias 2 e 3 do ciclo são folga do turno 2 (6 e 7 de maio)
+                    else if (cycleDay === 2 || cycleDay === 3) {
+                        turnoFolga = 'turno3';
+                        turnoText = 'T3';
+                    } 
+                    // Dias 4 e 5 do ciclo são folga do turno 3 (8 e 9 de maio)
+                    else if (cycleDay === 4 || cycleDay === 5) {
+                        turnoFolga = 'folguista';
+                        turnoText = 'FO';
+                    } 
+                    // Dias 6 e 7 do ciclo são folga do turno folguista (10 e 11 de maio)
+                    else if (cycleDay === 6 || cycleDay === 7) {
+                        turnoFolga = 'turno1';
+                        turnoText = 'T1';
+                    }
+                    
+                    // Adicionar a folga ao dia, se aplicável
+                    if (turnoFolga) {
+                        const dayContent = document.createElement('div');
+                        dayContent.classList.add('day-content', turnoFolga);
+                        dayContent.textContent = turnoText;
+                        dayElement.appendChild(dayContent);
+                    }
+                    
+                    calendar.appendChild(dayElement);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
