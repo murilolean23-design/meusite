@@ -24,6 +24,24 @@
             --border-radius: 12px;
             --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             --transition: all 0.3s ease;
+            
+            /* Novas variáveis para tema escuro */
+            --bg-color: white;
+            --text-color: #212529;
+            --card-bg: white;
+            --header-text: white;
+            --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .dark-theme {
+            --bg-color: #121212;
+            --text-color: #e9ecef;
+            --card-bg: #1e1e1e;
+            --header-text: #f8f9fa;
+            --light-gray: #2d2d2d;
+            --gray: #9d9d9d;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            --body-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         }
 
         * {
@@ -33,29 +51,33 @@
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--body-bg);
             min-height: 100vh;
             font-family: 'Segoe UI', 'Roboto', sans-serif;
             padding: 16px;
-            color: var(--dark);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: var(--transition);
+            background-color: var(--bg-color);
+            background-attachment: fixed; /* Isso faz o gradiente cobrir toda a tela */
         }
 
         .container {
             width: 100%;
             max-width: 1200px;
-            background: white;
+            background: var(--card-bg);
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             overflow: hidden;
             margin-top: 20px;
+            transition: var(--transition);
         }
 
         .header {
             background: linear-gradient(120deg, var(--primary), var(--secondary));
-            color: white;
+            color: var(--header-text);
             padding: 20px;
             text-align: center;
             position: relative;
@@ -91,6 +113,11 @@
             padding: 20px;
             background-color: var(--light);
             border-bottom: 1px solid var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .dark-theme .controls-container {
+            background-color: #2d2d2d;
         }
 
         .controls {
@@ -124,12 +151,13 @@
             padding: 14px 16px;
             border: 1px solid var(--light-gray);
             border-radius: var(--border-radius);
-            background-color: white;
+            background-color: var(--card-bg);
             font-size: 16px;
             appearance: none;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            color: var(--text-color);
         }
 
         select:focus {
@@ -179,7 +207,7 @@
             min-height: 80px;
             padding: 10px;
             border-radius: var(--border-radius);
-            background-color: white;
+            background-color: var(--card-bg);
             position: relative;
             display: flex;
             flex-direction: column;
@@ -197,7 +225,7 @@
         .day-number {
             align-self: flex-end;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--text-color);
             font-size: 0.9rem;
             margin-bottom: 5px;
             width: 24px;
@@ -232,6 +260,11 @@
             padding: 20px;
             background-color: var(--light);
             border-top: 1px solid var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .dark-theme .legend {
+            background-color: #2d2d2d;
         }
 
         .legend-item {
@@ -239,10 +272,12 @@
             align-items: center;
             gap: 8px;
             font-size: 0.9rem;
-            background: white;
+            background: var(--card-bg);
             padding: 8px 12px;
             border-radius: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            color: var(--text-color);
+            transition: var(--transition);
         }
 
         .legend-color {
@@ -265,11 +300,19 @@
         }
 
         .sunday {
-            background-color: #fff5f5;
+            background-color: rgba(255, 245, 245, 0.2);
+        }
+
+        .dark-theme .sunday {
+            background-color: rgba(255, 200, 200, 0.05);
         }
 
         .saturday {
-            background-color: #f8f9fa;
+            background-color: rgba(248, 249, 250, 0.3);
+        }
+
+        .dark-theme .saturday {
+            background-color: rgba(200, 200, 200, 0.05);
         }
 
         .current-day .day-number {
@@ -283,7 +326,40 @@
             margin: 10px 0;
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--text-color);
+        }
+
+        /* Botão de alternância de tema */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 10;
+            color: white;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .dark-theme .theme-toggle {
+            background: rgba(0, 0, 0, 0.2);
+            color: #f8f9fa;
+        }
+
+        .dark-theme .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.3);
         }
 
         /* Media queries para responsividade */
@@ -329,6 +405,13 @@
                 font-size: 0.65rem;
                 padding: 3px;
             }
+
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                width: 35px;
+                height: 35px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -372,6 +455,14 @@
             .month-year-display {
                 font-size: 1rem;
             }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
         }
 
         /* Animações */
@@ -391,6 +482,10 @@
 </head>
 <body>
     <div class="container">
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+        
         <div class="header">
             <h1>Controle de Folgas por Turno</h1>
             <div class="subtitle">Visualize as folgas de forma prática e organizada</div>
@@ -462,7 +557,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Preencher anos no seletor (de 2020 a 2040)
+            // Preencher anos no seletor (de 2020 to 2040)
             const yearSelect = document.getElementById('year');
             const currentYear = new Date().getFullYear();
             
@@ -500,6 +595,29 @@
             document.getElementById('year').addEventListener('change', function() {
                 updateMonthYearDisplay();
                 generateCalendar();
+            });
+            
+            // Alternar tema claro/escuro
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            
+            // Verificar se há uma preferência salva
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-theme');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                body.classList.toggle('dark-theme');
+                
+                if (body.classList.contains('dark-theme')) {
+                    localStorage.setItem('theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
             });
             
             function updateMonthYearDisplay() {
